@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Pengingat Minum OPM</title>
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        :root {
+            --card-bg: rgba(255, 255, 255, 0.88);
+            --text: #111;
+            --muted: #6b7280;
+            --accent: #0ea5a4;
+            --orange: rgba(239, 155, 15, 0.7);
+        }
+
+        /* 🔑 PERBAIKAN 1: Mengatur box-sizing untuk mencegah scroll horizontal */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+            margin: 0;
+            color: var(--text);
+            background: url('reminder OPM.jpg') no-repeat center center fixed;
+            background-size: cover;
+            /* 🔑 PERBAIKAN 2: Menggunakan Flexbox pada body untuk mendorong footer ke bawah */
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .top-nav {
+            display: flex;
+            width: 100%;
+            position: absolute;
+            top: 0px;
+            z-index: 10;
+            font-size: 18px;
+            background-color: var(--orange);
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 30px;
+        }
+
+        /* Grup Tautan */
+        .nav-links {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #4e3316;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 30px;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        /* --- LOGO --- */
+        .logo img {
+            max-width: 100px;
+            height: auto;
+            display: block;
+        }
+
+
+        .wrap {
+            width: 90%;
+            max-width: 1000px;
+            margin: 150px auto;
+            padding: 0 15px;
+            /* 🔑 PERBAIKAN 3: Memastikan konten utama (wrap) mengisi ruang dan mendorong footer */
+            flex-grow: 1;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(6px);
+            margin-bottom: 30px;
+        }
+
+        h5 { text-align: left; }
+
+        label {
+            display: block;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            color: var(--muted);
+        }
+
+        h1, h2, h3 { text-align: center; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-top: 6px;
+        }
+
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 14px;
+            font-weight: 600;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        
+        /* Mengelompokkan tombol agar bisa diatur di layar besar */
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        @media (min-width: 600px) {
+            .button-group {
+                flex-direction: row;
+            }
+            .button-group button {
+                width: auto;
+                flex-grow: 1;
+            }
+        }
+
+
+        button:hover { opacity: 0.9; }
+        .danger { background: #ef4444; }
+        .gray { background: #374151; }
+
+        .info { margin-top: 14px; color: var(--muted); font-size: 0.9rem; }
+        .countdown { font-weight: 700; font-size: 1.1rem; margin-top: 12px; text-align: center; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        th { background: #0ea5a4; color: white; }
+
+        /* 🔑 PERBAIKAN 4: CSS untuk footer (menggunakan class .footer) */
+        .footer {
+            width: 100%;
+            background-color: var(--orange); /* Latar belakang oranye transparan */
+            color: white; /* Teks putih untuk semua konten di dalam footer */
+            text-align: center;
+            padding: 20px 15px; /* Padding atas/bawah agar terlihat bagus */
+            margin-top: auto; /* Penting untuk Flexbox: Mendorong footer ke bawah */
+        }
+        
+        /* Gaya tambahan untuk teks di footer agar rapi */
+        .footer p {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+        
+        /* Menghapus paragraf pemisah warna oranye yang tidak terlihat */
+        .footer p[style*="color: rgba(239, 155, 15, 0.7)"] {
+            display: none;
+        }
+
+        /* Gaya untuk daftar pengingat yang baru ditambahkan */
+        .reminder-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+        }
+        .reminder-list-item:last-child {
+            border-bottom: none;
+        }
+        .reminder-list-item button {
+            margin: 0;
+            padding: 5px 10px;
+            width: auto;
+            font-size: 0.8rem;
+        }
+
+        /* Penyesuaian agar tampilan lebih semu di ponsel/layar kecil */
+        @media (max-width: 600px) {
+            .top-nav {
+                padding: 10px 15px;
+            }
+            .nav-links a {
+                margin-left: 15px;
+                font-size: 0.85rem;
+            }
+            .wrap {
+                margin: 100px auto 50px auto;
+                width: 95%;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header class="hero-image">
+        <nav class="top-nav">
+
+            <div class="logo">
+                <img src="logo siperca.png" alt="Logo Siperca">
+            </div>
+
+            <div class="nav-links">
+                <a href="file:///C:/Users/talit/Documents/halaman%20awal.html" target="_blank" title="Menuju ke halaman Home">Home</a>
+                <a href="file:///C:/Users/talit/Documents/index.html" target="_blank" title="Menuju ke halaman Pengingat">Pengingat</a>
+                <a href="file:///C:/Users/talit/Documents/data%20pasien.html" target="_blank" title="Menuju ke halaman Data Pasien">Data Pasien</a>
+            </div>
+
+        </nav>
+    </header>
+
+
+    <div class="wrap">
+
+        <div class="card">
+            <h1>Pengingat Minum POPM Cacingan</h1>
+
+            <label for="reminder-title">Nama Pengingat</label>
+            <input id="reminder-title" placeholder="Misal: Pemberantasan Cacing Sekolah A">
+
+            <label for="reminder-datetime">Waktu berikutnya</label>
+            <input id="reminder-datetime" type="datetime-local">
+
+            <label for="reminder-interval">Ulang setiap (hari)</label>
+            <input id="reminder-interval" type="number" min="0" value="0" placeholder="0 = hanya sekali">
+            
+            <div class="button-group">
+                <button id="set-reminder">Set Pengingat</button>
+                <button id="test-notif" class="gray">Tes Notifikasi</button>
+                <button id="clear-all-reminders" class="danger">Hapus Semua</button>
+            </div>
+
+            <hr>
+            
+            <h2>Pengingat Aktif</h2>
+            <div id="countdown-utama" class="countdown"></div>
+            <p class="info">Pengingat terdekat (Hitungan Mundur Utama)</p>
+            
+            <div id="reminder-list-container">
+                </div>
+            <p class="info">Klik 'Hapus' di sebelah pengingat yang ingin Anda batalkan.</p>
+        </div>
+
+    </div>
+
+    <footer class="footer">
+        <p style="margin-top: 50px; margin-bottom: 20px">Kreator: talithairsalina.15@gmail.com</p>
+        <p style=" margin-bottom: 20px">Dibuat untuk memenuhi tugas Ketahanan Pangan kelompok 7 yang beranggotakan:</p>
+        <p>Raidah Rif’at (8881250019)</p>
+        <p>Renata Zhafira Putri Herlia (8881250036)</p>
+        <p>Talitha Azzahra Irsalina (8881250022)</p>
+        <p style="margin-bottom: 50px">Zalfa Aprillia Andini (881250011)</p>
+    </footer>
+
+    <script>
+        const $ = id => document.getElementById(id);
+        // 🔑 PERUBAHAN JS 1: Mengubah ke array reminders
+        let allReminders = JSON.parse(localStorage.getItem('opm_reminders') || '[]');
+        let currentTimer = null;
+
+        if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+        if ('Notification' in window) Notification.requestPermission();
+        
+        function saveAllReminders() { 
+            // Urutkan berdasarkan waktu terdekat (terkecil)
+            allReminders.sort((a, b) => new Date(a.next_at) - new Date(b.next_at));
+            localStorage.setItem('opm_reminders', JSON.stringify(allReminders));
+            renderAllReminders(); 
+        }
+        
+        function formatDiff(ms) {
+            const s = Math.floor(ms / 1000), d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = Math.floor(s % 60);
+            return `${d}h ${h}j ${m}m ${sec}d`;
+        }
+
+        function triggerReminder(reminder) {
+            const title = reminder.title || 'Pengingat OPM';
+            const body = 'Waktu minum obat pemberantasan cacing (OPM) telah tiba.';
+            navigator.serviceWorker.ready.then(sw => {
+                sw.showNotification(title, { body, icon: 'bell.png', tag: 'opm-reminder' });
+            });
+        }
+        
+        function startCountdown() {
+            if (currentTimer) clearInterval(currentTimer);
+            
+            const cdDisplay = $('countdown-utama');
+            
+            if (allReminders.length === 0) {
+                cdDisplay.textContent = 'Tidak ada pengingat terjadwal.';
+                return;
+            }
+
+            // Ambil pengingat terdekat (yang pertama karena sudah diurutkan)
+            let reminder = allReminders[0];
+
+            currentTimer = setInterval(() => {
+                const now = new Date(), due = new Date(reminder.next_at);
+                let diff = due - now;
+
+                if (diff <= 0) {
+                    // Waktu sudah tiba/lewat
+                    triggerReminder(reminder);
+
+                    if (reminder.interval_days > 0) {
+                        // Jika berulang, majukan waktu berikutnya
+                        const next = new Date(due.getTime() + reminder.interval_days * 86400000);
+                        reminder.next_at = next.toISOString();
+                        
+                        // Hapus pengingat lama dari array, tambahkan yang baru, dan simpan
+                        allReminders.shift(); // Hapus yang sudah lewat
+                        allReminders.push(reminder);
+                        saveAllReminders(); // Menyimpan, mengurutkan, dan me-render ulang
+                        
+                    } else { 
+                        // Jika tidak berulang, hapus permanen
+                        allReminders.shift();
+                        saveAllReminders();
+                    }
+                    
+                    // Hentikan interval lama dan mulai lagi untuk pengingat terdekat yang baru
+                    clearInterval(currentTimer);
+                    startCountdown(); 
+                    return;
+                }
+
+                // Tampilkan hitungan mundur
+                cdDisplay.textContent = formatDiff(diff) + ' (Next: ' + due.toLocaleString() + ')';
+                
+            }, 1000);
+        }
+        
+        function deleteReminder(index) {
+            if (confirm('Yakin ingin menghapus pengingat ini?')) {
+                allReminders.splice(index, 1);
+                saveAllReminders();
+                startCountdown(); // Perbarui hitungan mundur
+            }
+        }
+        
+        // Fungsi baru untuk merender semua pengingat di list
+        function renderAllReminders() {
+            const container = $('reminder-list-container');
+            container.innerHTML = '';
+
+            if (allReminders.length === 0) {
+                container.innerHTML = '<p class="info" style="text-align:center;">Belum ada pengingat aktif.</p>';
+                $('countdown-utama').textContent = 'Tidak ada pengingat terjadwal.';
+                return;
+            }
+            
+            // Loop melalui daftar pengingat yang sudah diurutkan
+            allReminders.forEach((r, index) => {
+                const isNext = index === 0 ? ' (Berikutnya)' : '';
+                const listItem = document.createElement('div');
+                listItem.className = 'reminder-list-item';
+                listItem.innerHTML = `
+                    <span>
+                        **${r.title}**${isNext} <br> 
+                        <span style="color:var(--muted); font-size:0.85rem;">
+                            ${new Date(r.next_at).toLocaleString()} | Ulang: ${r.interval_days} hari
+                        </span>
+                    </span>
+                    <button class="danger" onclick="deleteReminder(${index})">Hapus</button>
+                `;
+                container.appendChild(listItem);
+            });
+            
+            // Pastikan hitungan mundur utama dimulai atau diperbarui
+            startCountdown();
+        }
+
+        // Event listener untuk tombol Set Pengingat
+        $('set-reminder').onclick = () => {
+            const title = $('reminder-title').value.trim();
+            const dt = $('reminder-datetime').value;
+            
+            if (!title || !dt) {
+                alert('Nama dan Waktu pengingat wajib diisi.');
+                return;
+            }
+            
+            const interval = parseInt($('reminder-interval').value) || 0;
+            const next = new Date(dt);
+            
+            if (isNaN(next.getTime())) {
+                alert('Waktu tidak valid');
+                return;
+            }
+            
+            // Pengingat baru
+            const newReminder = {
+                title: title,
+                next_at: next.toISOString(),
+                interval_days: interval,
+                // Tambahkan ID unik jika ini adalah aplikasi skala besar
+            };
+            
+            allReminders.push(newReminder);
+            saveAllReminders(); 
+            alert('Pengingat disimpan.');
+            // Reset input form
+            $('reminder-title').value = '';
+            $('reminder-datetime').value = '';
+            $('reminder-interval').value = '0';
+        };
+        
+        // Event listener untuk tombol Hapus Semua
+        $('clear-all-reminders').onclick = () => { 
+            if(confirm('Yakin ingin menghapus SEMUA pengingat?')) {
+                allReminders = [];
+                saveAllReminders();
+                startCountdown();
+                alert('Semua pengingat telah dihapus.');
+            }
+        };
+
+        // Event listener untuk tombol Tes Notifikasi
+        $('test-notif').onclick = () => { 
+            triggerReminder({title: 'Tes Notifikasi OPM'}); 
+        };
+
+        // Jalankan saat halaman dimuat
+        renderAllReminders();
+    </script>
+</body>
+
+</html>
